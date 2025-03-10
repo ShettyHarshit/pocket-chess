@@ -1,12 +1,42 @@
 const express = require("express");
 const cors = require("cors");
 const { Chess } = require("chess.js");
+const { Pool } = require("pg");
+require("dotenv").config();
 
 const app = express();
 const PORT = 5555;
 
 app.use(cors());
 app.use(express.json());
+
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+});
+
+const verifyDB = async () => {
+  const result = await pool.query(`
+      SELECT 1 FROM information_schema.tables 
+      WHERE table_name = 'games'
+  `);
+
+  if (!result.rows.length) {
+    throw new Error(
+      "❌ Database table 'games' does not exist. Please create it manually."
+    );
+  } else {
+    console.log("✅ Database and table verified.");
+  }
+};
+
+verifyDB().catch((err) => {
+  console.error(err.message);
+  process.exit(1); // Stop the server if DB check fails
+});
 
 let game = new Chess();
 
