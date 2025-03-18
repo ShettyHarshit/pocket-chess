@@ -36,3 +36,14 @@
     transform: rotate(360deg);
   }
 }
+
+.game-over-message {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #ffeb3b;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid #f57c00;
+  border-radius: 5px;
+}
