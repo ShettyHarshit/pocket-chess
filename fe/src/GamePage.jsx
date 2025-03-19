@@ -46,7 +46,7 @@ export default function GamePage() {
     }
   };
 
-  if (!game) return <p>Loading game...</p>;
+  if (!game) return <p>Loading game...</p>
 
   return (
     <div>
