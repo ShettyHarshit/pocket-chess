@@ -46,7 +46,7 @@ export default function GamePage() {
     }
   };
 
-  if (!game) return <p>Loading game...</p>
+  if (!game) return <p>Loading game...</p>;
 
   return (
     <div>
@@ -56,8 +56,8 @@ export default function GamePage() {
       {error && <p style={{ color: "red" }}>{error}</p>}
       <Chessboard
         position={game.fen}
-        boardWidth={400}
-        animationDuration={500} // Enables smooth animation
+        boardWidth={600}
+        animationDuration={300}
         onPieceDrop={(sourceSquare, targetSquare, extraProps) => {
           const move = {
             from: sourceSquare,
@@ -66,6 +66,14 @@ export default function GamePage() {
           handleMove(move);
         }}
         draggable={!gameOver} // Disable moves when game over
+        areArrowsAllowed={true}
+        customBoardStyle={{
+          borderRadius: "0.5rem",
+          boxShadow:
+            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        }}
+        customDarkSquareStyle={{ backgroundColor: "#779556" }}
+        customLightSquareStyle={{ backgroundColor: "#edeed1" }}
       />
       {message && (
         <div
