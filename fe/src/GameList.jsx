@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./components/ui/button";
+import { useUser } from "@clerk/clerk-react";
+import React from "react";
+import ChessHero from "./custom-components/ChessHero";
 
 export default function GameList() {
+  const { isSignedIn, user } = useUser();
   const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleNewGame = async () => {
     const response = await fetch("http://localhost:5555/create-game", {
@@ -16,8 +21,6 @@ export default function GameList() {
       setGames((prevGames) => [...prevGames, data.game]);
     }
   };
-
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:5555/games")
@@ -32,79 +35,52 @@ export default function GameList() {
   return (
     <main className="flex min-h-screen flex-col items-center">
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative py-16 md:py-24 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                Pocket Chess: Play Anywhere
-              </h1>
-              <p className="text-xl text-muted-foreground mb-6">
-                Enjoy quick chess matches on the go! Play against AI or
-                challenge friends online. Track your progress and improve your
-                skills anytime, anywhere.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="/play/single-player">
-                  <Button size="lg" variant="outline">
-                    Play Now
-                  </Button>
-                </Link>
-                <Link href="/auth/login">
-                  <Button size="lg" variant="outline">
-                    Sign In
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="flex justify-center items-center">
-              <div className="relative w-[320px] h-[320px] md:w-[400px] md:h-[400px] bg-muted rounded-lg overflow-hidden border-2 border-gray-300 shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#404040]/20 to-[#D9D9D9]/5 z-10"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-full h-full grid grid-cols-8 grid-rows-8">
-                    {Array.from({ length: 64 }).map((_, i) => {
-                      const row = Math.floor(i / 8);
-                      const col = i % 8;
-                      const isBlack = (row + col) % 2 === 1;
-                      return (
-                        <div
-                          key={i}
-                          className={`${
-                            isBlack ? "bg-gray-700" : "bg-gray-200"
-                          } border border-gray-400`}
-                        />
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">Chess Games</h1>
-        <Button variant="outline" onClick={handleNewGame} className="mb-4">
-          New Game
-        </Button>
-
-        {loading ? (
-          <p className="text-gray-500">Loading games...</p>
+        {!isSignedIn ? (
+          <ChessHero />
         ) : (
-          <ul className="space-y-2">
-            {games.map((game) => (
-              <li
-                key={game.id}
-                className="border p-2 rounded hover:bg-gray-100"
+          <div className="mx-auto max-w-3xl p-6 bg-white rounded-lg shadow-md border">
+            <h1 className="text-3xl font-bold text-center mb-6 text-gray-900">
+              Chess Games
+            </h1>
+
+            <div className="flex justify-center mb-6">
+              <Button
+                variant="default"
+                onClick={handleNewGame}
+                className="px-6 py-2"
               >
-                <Link
-                  to={`/game/${game.id}`}
-                  className="text-blue-500 hover:underline"
-                >
-                  Game #{game.id} - {game.fen}
-                </Link>
-              </li>
-            ))}
-          </ul>
+                ➕ Start New Game
+              </Button>
+            </div>
+
+            {loading ? (
+              <p className="text-gray-500 text-center">♟️ Loading games...</p>
+            ) : games.length === 0 ? (
+              <p className="text-gray-500 text-center">
+                No games available. Start a new game!
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {games.map((game) => (
+                  <li
+                    key={game.id}
+                    className="flex justify-between items-center p-4 border rounded-lg shadow-sm hover:bg-gray-50 transition"
+                  >
+                    <Link
+                      to={`/game/${game.id}`}
+                      className="text-blue-600 font-medium hover:underline"
+                    >
+                      ♜ Game #{game.id} –{" "}
+                      <span className="text-gray-700">{game.fen}</span>
+                    </Link>
+                    <Button variant="outline" className="text-sm">
+                      Join
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </main>
