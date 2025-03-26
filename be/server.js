@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const { Chess } = require("chess.js");
 const { Pool } = require("pg");
+const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node");
 require("dotenv").config();
 
 const app = express();
@@ -9,6 +10,10 @@ const PORT = 5555;
 
 app.use(cors());
 app.use(express.json());
+
+const clerkAuth = ClerkExpressWithAuth({
+  secretKey: process.env.CLERK_SECRET_KEY,
+});
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -48,7 +53,7 @@ app.get("/board", (req, res) => {
 });
 
 // Create new game
-app.post("/create-game", async (req, res) => {
+app.post("/create-game", clerkAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(
       `
