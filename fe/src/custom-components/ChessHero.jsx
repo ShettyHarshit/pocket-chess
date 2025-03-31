@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { Link } from "react-router-dom";
 import ChessBoardIllustration from "./ChessBoardIllustration";
+import { SignInButton } from "@clerk/clerk-react";
 
 function ChessHero(props) {
   return (
@@ -18,16 +18,9 @@ function ChessHero(props) {
               anytime, anywhere.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link to="/play/single-player">
-                <Button size="lg" variant="outline">
-                  Play Now
-                </Button>
-              </Link>
-              <Link to="/auth/login">
-                <Button size="lg" variant="default">
-                  Sign In
-                </Button>
-              </Link>
+              <SignInButton>
+                <Button size="lg">Play Now</Button>
+              </SignInButton>
             </div>
           </div>
           <div className="flex justify-center items-center">
