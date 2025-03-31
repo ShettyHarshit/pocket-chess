@@ -1,30 +1,28 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./components/ui/button";
 import { useUser } from "@clerk/clerk-react";
 import React from "react";
 import ChessHero from "./custom-components/ChessHero";
+import { createNewGame, fetchGames } from "./models/game";
 
 export default function GameList() {
   const { isSignedIn, user } = useUser();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const handleNewGame = async () => {
-    const response = await fetch("http://localhost:5555/create-game", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    createNewGame().then((data) => {
+      navigate(`/game/${data.game.id}`);
+      if (data.success) {
+        setGames((prevGames) => [...prevGames, data.game]);
+      }
     });
-
-    const data = await response.json();
-    if (data.success) {
-      setGames((prevGames) => [...prevGames, data.game]);
-    }
   };
 
   useEffect(() => {
-    fetch("http://localhost:5555/games")
-      .then((res) => res.json())
+    fetchGames()
       .then((data) => {
         setGames(data);
         setLoading(false);
@@ -73,9 +71,11 @@ export default function GameList() {
                       ♜ Game #{game.id} –{" "}
                       <span className="text-gray-700">{game.fen}</span>
                     </Link>
-                    <Button variant="outline" className="text-sm">
-                      Join
-                    </Button>
+                    <Link to={`/game/${game.id}`}>
+                      <Button variant="outline" className="text-sm">
+                        Join
+                      </Button>
+                    </Link>
                   </li>
                 ))}
               </ul>
