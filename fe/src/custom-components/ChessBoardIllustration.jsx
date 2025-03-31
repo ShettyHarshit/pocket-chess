@@ -54,7 +54,8 @@ const ChessBoardIllustration = () => {
     <div
       className="relative w-[320px] h-[320px] md:w-[400px] md:h-[400px] 
       bg-muted rounded-lg overflow-hidden border-2 border-gray-300 
-      shadow-[0_4px_15px_rgba(0,0,0,0.3)]"
+      shadow-[0_10px_30px_rgba(0,0,0,0.4)] transform translate-y-4 
+      perspective-[1000px] rotate-x-[10deg]"
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="w-full h-full grid grid-cols-8 grid-rows-8">
@@ -87,8 +88,6 @@ const ChessBoardIllustration = () => {
                         : "before:opacity-90 before:blur-[5px] before:bg-yellow-400 shadow-[0_0_50px_rgba(255,215,0,0.5)] transition-all duration-[1s] ease-in-out"
                       : "before:opacity-0 transition-all duration-[1s] ease-in-out"
                   }
-
-                  
                 `}
               />
             );
