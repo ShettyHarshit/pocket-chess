@@ -2,7 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const { Chess } = require("chess.js");
 const { Pool } = require("pg");
-const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node");
+const {
+  clerkClient,
+  requireAuth,
+  getAuth,
+  clerkMiddleware,
+} = require("@clerk/express");
 require("dotenv").config();
 
 const app = express();
@@ -10,10 +15,7 @@ const PORT = 5555;
 
 app.use(cors());
 app.use(express.json());
-
-const clerkAuth = ClerkExpressWithAuth({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
+app.use(clerkMiddleware());
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -53,7 +55,7 @@ app.get("/board", (req, res) => {
 });
 
 // Create new game
-app.post("/create-game", clerkAuth, async (req, res) => {
+app.post("/create-game", async (req, res) => {
   try {
     const { rows } = await pool.query(
       `
@@ -175,6 +177,29 @@ app.post("/move", async (req, res) => {
 
 app.get("/last-move", (req, res) => {
   res.json({ move: lastAiMove, fen: game.fen() });
+});
+
+app.post("/create-blitz-game", async (req, res) => {
+  try {
+    // Example of using Clerk's user ID
+    // const userId = req?.auth?.userId || "";
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Insert a new Blitz game (White player = creator, Black player = null)
+    const { rows } = await pool.query(
+      `INSERT INTO blitz_games (white_player_id, black_player_id, fen, moves, status)
+       VALUES ($1, NULL, $2, '[]', 'waiting')
+       RETURNING id`,
+      [userId, new Chess().fen()]
+    );
+    res.json({ success: true, gameId: rows[0].id });
+  } catch (error) {
+    console.error("Error creating Blitz game:", error);
+    res.status(500).json({ error: "Failed to create Blitz game" });
+  }
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
