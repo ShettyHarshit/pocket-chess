@@ -12,6 +12,7 @@ import GameList from "./GameList";
 import React from "react";
 import GamePage from "./GamePage";
 import AuthPage from "./pages/AuthPage";
+import BlitzRoom from "./pages/BlitzRoom";
 
 export default function App() {
   const { isSignedIn, user } = useUser();
@@ -50,6 +51,14 @@ export default function App() {
             element={
               <SignedIn>
                 <GamePage />
+              </SignedIn>
+            }
+          />
+          <Route
+            path="/blitz/:id"
+            element={
+              <SignedIn>
+                <BlitzRoom />
               </SignedIn>
             }
           />
